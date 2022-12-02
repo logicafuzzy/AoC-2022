@@ -19,19 +19,22 @@ bool isScissors(string play){
     return play.compare("C") == 0 || play.compare("Z") == 0;
 }
 
+bool areSame(string opponent, string me) {
+    if ((isRock(opponent) && isRock(me))
+        || (isPaper(opponent) && isPaper(me))
+        || (isScissors(opponent) && isScissors(me))
+        return true;
+
+    return false;
+}
+
 int getScore(string opponent, string me)
 {
     constexpr int lost = 0;
     constexpr int draw = 3;
     constexpr int win = 6;
 
-    if (isRock(opponent) && isRock(me))
-        return draw;
-
-    if (isPaper(opponent) && isPaper(me))
-        return draw;
-
-    if (isScissors(opponent) && isScissors(me))
+    if (areSame(opponent, me))
         return draw;
 
     //opponent calls rock
