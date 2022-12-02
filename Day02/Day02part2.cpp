@@ -7,25 +7,75 @@
 
 using namespace std;
 
+const string oRock("A");
+const string oPaper("B");
+const string oScissors("C");
+
+const string iRock("X");
+const string iPaper("Y");
+const string iScissors("Z");
+
 bool isRock(string play){
-    return play.compare("A") == 0 || play.compare("X") == 0;
+    return play.compare(oRock) == 0 || play.compare(iRock) == 0;
 }
 
 bool isPaper(string play){
-    return play.compare("B") == 0 || play.compare("Y") == 0;
+    return play.compare(oPaper) == 0 || play.compare(iPaper) == 0;
 }
 
 bool isScissors(string play){
-    return play.compare("C") == 0 || play.compare("Z") == 0;
+    return play.compare(oScissors) == 0 || play.compare(iScissors) == 0;
 }
 
 bool areSame(string opponent, string me) {
     if ((isRock(opponent) && isRock(me))
         || (isPaper(opponent) && isPaper(me))
-        || (isScissors(opponent) && isScissors(me))
+        || (isScissors(opponent) && isScissors(me)))
         return true;
 
     return false;
+}
+
+string getWinner(string opponent) {
+    if (isRock(opponent))
+        return iPaper;
+
+    if(isPaper(opponent))
+        return iScissors;
+
+    if(isScissors(opponent))
+        return iRock;
+
+    assert(false);
+    return "";
+}
+
+string getDraw(string opponent) {
+    if (isRock(opponent))
+        return iRock;
+
+    if(isPaper(opponent))
+        return iPaper;
+
+    if(isScissors(opponent))
+        return iScissors;
+
+    assert(false);
+    return "";  
+}
+
+string getLoser(string opponent) {
+    if (isRock(opponent))
+        return iScissors;
+
+    if(isPaper(opponent))
+        return iRock;
+
+    if(isScissors(opponent))
+        return iPaper;
+
+    assert(false);
+    return ""; 
 }
 
 int getScore(string opponent, string me)
@@ -34,13 +84,7 @@ int getScore(string opponent, string me)
     constexpr int draw = 3;
     constexpr int win = 6;
 
-    if (isRock(opponent) && isRock(me))
-        return draw;
-
-    if (isPaper(opponent) && isPaper(me))
-        return draw;
-
-    if (isScissors(opponent) && isScissors(me))
+    if (areSame(opponent, me))
         return draw;
 
     //opponent calls rock
@@ -106,7 +150,16 @@ int main() {
         getline(sline, first, ' ');
         string second;
         getline(sline, second, ' ');
-
+        
+        if (second.compare("X") == 0)
+            second = getLoser(first);
+        else if (second.compare("Y") == 0)
+            second = getDraw(first);
+        else if (second.compare("Z") == 0)
+            second = getWinner(first);
+        else
+            assert(false); //this should never happen
+        
         int score = getScore(first, second);
         int playScore = getPlayScore(second);
 

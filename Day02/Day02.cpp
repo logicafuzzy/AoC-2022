@@ -22,7 +22,7 @@ bool isScissors(string play){
 bool areSame(string opponent, string me) {
     if ((isRock(opponent) && isRock(me))
         || (isPaper(opponent) && isPaper(me))
-        || (isScissors(opponent) && isScissors(me))
+        || (isScissors(opponent) && isScissors(me)))
         return true;
 
     return false;
