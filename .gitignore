@@ -8,6 +8,9 @@
 !.vscode/*.code-snippets
 *.dSYM
 
+# exclude binary file
+Day*/Day*
+
 # Local History for Visual Studio Code
 .history/
 
