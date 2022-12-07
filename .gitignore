@@ -13,3 +13,8 @@
 
 # Built Visual Studio Code Extensions
 *.vsix
+x64/*
+*/x64/*
+
+*.filters
+*.user
