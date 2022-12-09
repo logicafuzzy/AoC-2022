@@ -10,6 +10,7 @@
 
 # exclude binary file
 Day*/Day*
+!Day*/Day*.*
 
 # Local History for Visual Studio Code
 .history/
