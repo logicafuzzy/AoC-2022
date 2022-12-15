@@ -51,11 +51,11 @@ vector<vector<int>> getMap() {
 			}
 
 			if (c >= 'a' && c <= 'z')
-				maprow.push_back(c - 97);
+				maprow.push_back(c );
 
 			col++;
 		}
-		
+
 		result.push_back(maprow);
 
 		row++;
@@ -89,8 +89,8 @@ vector<path> getBranches(const path& pos) {
 				&& (r == pos.row || c == pos.col) // not diagonal
 				&& !hasPrev(pos, r, c) // not loop
 				&& mapmatrix[r][c] <= curr + 1 // at most one higher
-				&& (visited.find({ r, c }) == visited.end() || visited.find({r, c})->second < pos.prev.size()) //not visited with better results
-			) {
+				&& (visited.find({ r, c }) == visited.end() || visited.find({ r, c })->second < pos.prev.size()) //not visited with better results
+				) {
 				results.push_back({ r, c, pos.prev });
 				visited[{ r, c }] = pos.prev.size();
 			}
@@ -137,14 +137,12 @@ void printPath(const path& p) {
 	}
 }
 
-int main() {
-	cout << " AoC 2022 Day12" << endl;
-
-	mapmatrix = getMap();
-
+int getMinPath(int startrow, int startcol) {
 	vector<path> solutions;
 
-	solutions.push_back({ start.first, start.second });
+	visited.clear();
+
+	solutions.push_back({startrow, startcol});
 
 	while (true) {
 		vector<path> newsolutions;
@@ -160,9 +158,7 @@ int main() {
 
 		int minSteps = getMinSolution(solutions);
 
-		cout << "solutions: " << solutions.size() << " min: " << minSteps << endl;
-
-		solutions.erase(remove_if(solutions.begin(), solutions.end(), [minSteps](const path& el) { 
+		solutions.erase(remove_if(solutions.begin(), solutions.end(), [minSteps](const path& el) {
 			return el.dead || (!el.finish && el.prev.size() >= minSteps) || (visited.find({ el.row, el.col }) != visited.end() && visited.find({ el.row, el.col })->second > el.prev.size()); }), solutions.end());
 
 		bool allFinish = true;
@@ -174,12 +170,39 @@ int main() {
 
 	}
 
-	cout << "Minsteps: " << getMinSolution(solutions) << endl;
+	int minPath = getMinSolution(solutions);
 
-	for (const auto& s : solutions) {
-		printPath(s);
-		cout << endl;
+	cout << "Minsteps: " << minPath << endl;
+
+	return minPath;
+}
+
+int main() {
+	cout << " AoC 2022 Day12" << endl;
+
+	mapmatrix = getMap();
+
+	int minPath = 10000;
+	
+	int row = 0;
+	int col = 0;
+
+	for (int r = 0; r < mapmatrix.size(); r++) {
+		for (int c = 0; c < mapmatrix[r].size(); c++) {
+			if (mapmatrix[r][c] == 'a') {
+				int tempmin = getMinPath(r, c);
+
+				if (tempmin < minPath)
+					minPath = tempmin;
+			}
+		}
 	}
+
+	cout << "Minpath starting from an a: " << minPath << endl;
+	//for (const auto& s : solutions) {
+	//	printPath(s);
+	//	cout << endl;
+	//}
 
 	return 0;
 }
