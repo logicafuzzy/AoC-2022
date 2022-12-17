@@ -134,8 +134,10 @@ unsigned long main() {
 		assert(free_rows == get_free_rows(chamber) - 3 - rock.get_height());
 
 		if (free_rows < 0) {
-			add_rows(chamber, -free_rows);
-			latest_top += -free_rows;
+			long new_rows = max(100l, -free_rows);
+			add_rows(chamber, new_rows);
+			latest_top += new_rows;
+			free_rows = latest_top - 3 - rock.get_height();
 		}
 
 		int left_offset = 2;
