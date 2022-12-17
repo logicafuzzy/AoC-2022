@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <iterator>
 
-//#define NDEBUG
+#define NDEBUG
 #include <cassert>
 
 #include "rock.hpp"
@@ -86,7 +86,7 @@ unsigned long main() {
 	vector<char> jets;
 	copy(line.begin(), line.end(), back_inserter(jets));
 
-	const unsigned long long n_rocks = 2022; // 1000000000000;
+	const unsigned long long n_rocks = 2022;// 1000000000;// 1000000000000ul;
 
 	unsigned long long stopped_rocks = 0;
 
@@ -172,7 +172,7 @@ unsigned long main() {
 		stopped_rocks++;
 
 		if (stopped_rocks % 1000000 == 0)
-			cout << "cycle: " << stopped_rocks << " " << float(int(stopped_rocks / n_rocks * 100000)) / 1000.0 << "%" <<  endl;
+			cout << "cycle: " << stopped_rocks << " " << float(int((float)stopped_rocks / (float)n_rocks * 10000)) / 100.0 << "%" <<  endl;
 	}
 
 	//print_chamber(chamber);
