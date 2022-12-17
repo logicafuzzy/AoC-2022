@@ -5,8 +5,6 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
-
-#define NDEBUG
 #include <cassert>
 
 #include "rock.hpp"
@@ -17,8 +15,7 @@ using namespace std;
 unsigned long get_free_rows(const rock_t::chamber_t& chamber) {
 	int csize = rock_t::chamber_width;
 	for (unsigned long i = 0; i < chamber.size(); i++)
-		for (char c : chamber[i])
-			if (c == '#')
+		if(find(chamber[i].begin(), chamber[i].end(), '#') != chamber[i].end())
 				return i;
 
 	return chamber.size();
@@ -29,8 +26,9 @@ unsigned long get_reachable_row(const rock_t::chamber_t& chamber) {
 	stop.fill(false);
 
 	for (unsigned long i = 0; i < chamber.size(); i++) {
+#pragma loop( hint_parallel(7)) 
 		for (int c = 0; c < chamber[i].size(); c++) {
-			if (chamber[i][c] == '#')
+			if (!stop[c] && chamber[i][c] == '#')
 				stop[c] = true;
 		}
 		if (all_of(stop.begin(), stop.end(), [](auto el) {return el == true; }))
@@ -86,7 +84,9 @@ unsigned long main() {
 	vector<char> jets;
 	copy(line.begin(), line.end(), back_inserter(jets));
 
-	const unsigned long long n_rocks = 2022;// 1000000000;// 1000000000000ul;
+	//const unsigned long long n_rocks = 2022;
+	//const unsigned long long n_rocks =   1000000000;
+	const unsigned long long n_rocks = 1000000000000ul;
 
 	unsigned long long stopped_rocks = 0;
 

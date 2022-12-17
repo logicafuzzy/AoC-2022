@@ -11,6 +11,7 @@ bool rock_t::try_position(const chamber_t& chamber, int left_offset, unsigned lo
 	if (chamber[0].size() - left_offset < get_width())
 		return false;
 
+#pragma loop( hint_parallel(7)) 
 	for (int t = get_height() - 1; t >= 0; t--) {
 		if (!fit(_shape[t], chamber[t + top_offset], left_offset))
 			return false;
@@ -36,6 +37,7 @@ bool rock_t::fit(const vector<char>& shape, const array<char, chamber_width>& de
 	if (shape.size() + left_offset > chamber_width)
 		return false;
 
+#pragma loop( hint_parallel(7)) 
 	for (int i = 0; i < shape.size(); i++) {
 		if (shape[i] == '#' && dest[i + left_offset] == '#') // collision
 			return false;
