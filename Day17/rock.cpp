@@ -8,14 +8,17 @@ bool rock_t::try_position(const chamber_t& chamber, int left_offset, unsigned lo
 	if (left_offset < 0)
 		return false;
 
-	if (chamber[0].size() - left_offset < get_width())
+	if (area_width - left_offset < get_width())
 		return false;
-
-#pragma loop( hint_parallel(7)) 
-	for (int t = get_height() - 1; t >= 0; t--) {
-		if (!fit(_shape[t], chamber[t + top_offset], left_offset))
+ 
+	for (const auto& p : get_indexes())
+		if (chamber[p.first + top_offset][p.second + left_offset])
 			return false;
-	}
+	
+	//for (int t = get_height() - 1; t >= 0; t--) {
+	//	if (!fit(_shape[t], chamber[t + top_offset], left_offset))
+	//		return false;
+	//}
 
 	return true;
 }
@@ -26,20 +29,20 @@ void rock_t::set_position(chamber_t& chamber, int left_offset, unsigned long top
 
 	for (int t = 0; t < get_height(); t++) {
 		for (int i = 0; i < get_width(); i++) {
-			if (_shape[t][i] == '#')
-				chamber[t + top_offset][i + left_offset] = '#';
+			if (_shape[t][i])
+				chamber[t + top_offset][i + left_offset] = true;
 		}
 	}
 }
 
-bool rock_t::fit(const vector<char>& shape, const array<char, chamber_width>& dest, int left_offset) const
+bool rock_t::fit(const row_t& shape, const chamber_row_t& dest, int left_offset) const
 {
-	if (shape.size() + left_offset > chamber_width)
+	if (shape.size() + left_offset > area_width)
 		return false;
 
-#pragma loop( hint_parallel(7)) 
+	//TODO can be bitwise shift + or
 	for (int i = 0; i < shape.size(); i++) {
-		if (shape[i] == '#' && dest[i + left_offset] == '#') // collision
+		if (shape[i] && dest[i + left_offset]) // collision
 			return false;
 	}
 

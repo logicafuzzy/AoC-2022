@@ -12,36 +12,43 @@
 
 using namespace std;
 
+struct pattern {
+	int rock_id;
+	int jet_id;
+	unsigned long extent;
+};
+
 unsigned long get_free_rows(const rock_t::chamber_t& chamber) {
-	int csize = rock_t::chamber_width;
 	for (unsigned long i = 0; i < chamber.size(); i++)
-		if(find(chamber[i].begin(), chamber[i].end(), '#') != chamber[i].end())
+		for(const auto& c : chamber[i])
+			if (c)
 				return i;
 
 	return chamber.size();
 }
 
 unsigned long get_reachable_row(const rock_t::chamber_t& chamber) {
-	array<bool, rock_t::chamber_width> stop;
-	stop.fill(false);
+	bitset<rock_t::area_width> stop, test;
+	stop.reset(); //all 0
+	test.set();   //all 1
 
 	for (unsigned long i = 0; i < chamber.size(); i++) {
-#pragma loop( hint_parallel(7)) 
 		for (int c = 0; c < chamber[i].size(); c++) {
-			if (!stop[c] && chamber[i][c] == '#')
-				stop[c] = true;
+			if (!stop[c] && chamber[i][c])
+				stop.set(c);
 		}
-		if (all_of(stop.begin(), stop.end(), [](auto el) {return el == true; }))
+		if (stop == test)
 			return i;
+		
 	}		
 
 	return chamber.size();
 }
 
 void add_rows(rock_t::chamber_t& chamber, unsigned long count) {
-	array<char, rock_t::chamber_width> row;
+	rock_t::chamber_row_t row;
 
-	row.fill('.');
+	row.fill(false);
 
 	vector<decltype(row)> rows;
 	rows.resize(count, row);
@@ -55,8 +62,8 @@ unsigned long get_jet_dir(char c) {
 
 void print_chamber(const rock_t::chamber_t& chamber) {
 	for (auto& row : chamber) {
-		for (auto& c : row) {
-			cout << c << ' ';
+		for (int i = 0; i < row.size(); i++) {
+			cout << (row[i] ? '#' : '.') << ' ';
 		}
 		cout << endl;
 	}
@@ -70,7 +77,7 @@ void print_chamber(rock_t::chamber_t chamber, const rock_t& rock, unsigned long 
 	print_chamber(chamber);
 }
 
-unsigned long main() {
+int main() {
 	cout << " AoC 2022 Day17" << endl;
 
 	rock_t::chamber_t chamber;
@@ -90,26 +97,25 @@ unsigned long main() {
 
 	unsigned long long stopped_rocks = 0;
 
-	rock_t rock0({ {'#', '#', '#', '#'} });
+	rock_t rock0({ {1, 1, 1, 1} });
 
-	rock_t rock1({ {'.', '#', '.'},
-				   {'#', '#', '#'},
-				   {'.', '#', '.'} });
+	rock_t rock1({ {0, 1, 0},
+					{1, 1, 1},
+					{0, 1, 0} });
 
-	rock_t rock2({ {'.', '.', '#'},
-				   {'.', '.', '#'},
-				   {'#', '#', '#'} });
+	rock_t rock2({	{0, 0, 1},
+					{0, 0, 1},
+					{1, 1, 1} });
 
-	rock_t rock3({  {'#'},
-					{'#'},
-					{'#'},
-					{'#'} });
+	rock_t rock3({ {1},
+					{1},
+					{1},
+					{1} });
 
-	rock_t rock4({ {'#', '#'},
-				   {'#', '#'}
-		});
+	rock_t rock4({  {1, 1},
+					{1, 1} });
 
-	vector<rock_t> rocks = { rock0, rock1, rock2, rock3, rock4 };
+	vector<rock_t> rocks = { rock0, rock1, rock2, rock3, rock4};
 	int rock_index = 0;
 	int jet_index = 0;
 	unsigned long deleted = 0;
@@ -118,7 +124,7 @@ unsigned long main() {
 	while (stopped_rocks < n_rocks) {
 		const rock_t& rock = rocks[rock_index];
 		
-		if (stopped_rocks % 1000 == 0) {
+		if (stopped_rocks % 100 == 0) {
 			unsigned long reachable = get_reachable_row(chamber);
 
 			if (reachable < chamber.size()) {
