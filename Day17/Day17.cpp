@@ -118,7 +118,7 @@ int main() {
 	vector<rock_t> rocks = { rock0, rock1, rock2, rock3, rock4};
 	int rock_index = 0;
 	int jet_index = 0;
-	unsigned long deleted = 0;
+	unsigned long long deleted = 0;
 	long latest_top = 0;
 
 	while (stopped_rocks < n_rocks) {
