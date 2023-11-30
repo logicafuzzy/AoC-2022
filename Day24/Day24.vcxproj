@@ -22,7 +22,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{9262FCC9-6159-46A3-8236-2324B4D4FEC3}</ProjectGuid>
-    <RootNamespace>Day16</RootNamespace>
+    <RootNamespace>Day24</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -127,11 +127,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Day16.cpp" />
+    <ClCompile Include="Day24.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Day16.txt" />
-    <Text Include="Day16test.txt" />
+    <Text Include="Day24.txt" />
+    <Text Include="Day24test.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
