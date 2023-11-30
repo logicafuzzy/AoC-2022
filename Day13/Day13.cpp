@@ -1,75 +1,51 @@
 #include <iostream>
-
 #include <fstream>
 #include <string>
 #include <vector>
-#include <cassert>
-#include <typeinfo>
 #include <sstream>
-#include <stack>
 
 using namespace std;
 
-class list;
-class list_leaf;
-class value;
-
 class list {
 public:
-	vector<list> l;
+	list(int number) : _number(number), _isNumber(true) {}
+	list(vector<list> list) : _number(0), _isNumber(false), _subList(list) {}
 
-	virtual const list& get(int index) const { return l[index]; };
-	virtual size_t size() const { return l.size();	};
+private:
+	bool _isNumber{ true };
+	int _number{ 0 };
+	vector<list> _subList;
 
-	virtual bool operator <= (const list& other) const {
-		if (typeid(*this) == typeid(value) && typeid(other) == typeid(value))
-			return static_cast<const value*>(this)->v <= static_cast<const value&>(other).v;
-
-		list left = *this;
-		if (typeid(left) == typeid(value))
-			left = list_leaf({static_cast<const value&>(left)});
-
-		list right = other;
-		if (typeid(right) == typeid(value))
-			right = list_leaf({ static_cast<const value&>(right) });
-
-		for (int i = 0; i < min(size(), other.size()); i++) {
-			if (!(get(i) <= other.get(i)))
-				return false;
+	int compare(const list& other) {
+		if (_isNumber && other._isNumber) {
+			return _number == other._number ? 0 : _number < other._number ? -1 : 1;
 		}
-		//all less or equal until now, check size
-		if (size() <= other.size())
-			return true;
-		
-		return false;
-	}
-};
+		else if (!_isNumber && !other._isNumber) {
+			for (int i = 0; i < min(_subList.size(), other._subList.size()); ++i) {
+				int comp = _subList[i].compare(other);
+				if (comp == 0)
+					continue;
+				else
+					return comp;
+			}
 
-class list_leaf : public list {
-public:
-	list_leaf(vector<value> values_) : values(values_) {};
-
-	vector<value> values;
-	const list& get(int index) const override { return values[index]; };
-	virtual size_t size() const override { return values.size(); }
-
-};
-
-class value : public list {
-public:
-	int v;
-	const list& get(int index) const override { assert(false);  return *this; };
-	virtual size_t size() const override { return 1; }
-};
-
-list make_list(const string& line) {
-	list result;
-	stack<list> context;
-
-	for (char c : line) {
+			if (_subList.size() == other._subList.size())
+				return 0;
+			else
+				return _subList.size() > other._subList.size() ? 1 : -1;
+		}
+		else if (_isNumber) {
+			list converted({ _number });
+			return converted.compare(other);
+		}
+		else {
+			list converted({ other._number });
+			return compare(converted);
+		}
 
 	}
-}
+};
+
 
 void test() {
 
@@ -78,7 +54,7 @@ void test() {
 int main() {
 	cout << " AoC 2022 Day13" << endl;
 
-	ifstream input("Day13.txt");
+	ifstream input("Day13test.txt");
 
 	while (input) {
 		string line;
