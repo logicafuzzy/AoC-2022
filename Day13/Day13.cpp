@@ -6,51 +6,13 @@
 #include <tuple>
 #include <cassert>
 
+#include "list.h"
+
 using namespace std;
 
-class list {
-public:
-	list(int number) : _number(number), _isNumber(true) {}
-	list(std::initializer_list<list> list) : _number(0), _isNumber(false), _subList(list) {}
+void make_lists(vector<list>& first, vector<list>& second);
 
-	int compare(const list& other) {
-		if (_isNumber && other._isNumber) {
-			cout << "compare " << _number << " with " << other._number << endl;
-			return _number == other._number ? 0 : _number < other._number ? -1 : 1;
-		}
-		else if (!_isNumber && !other._isNumber) {
-			for (int i = 0; i < min(_subList.size(), other._subList.size()); ++i) {
-				int comp = _subList[i].compare(other._subList[i]);
-				if (comp == 0)
-					continue;
-				else
-					return comp;
-			}
-
-			if (_subList.size() == other._subList.size())
-				return 0;
-			else
-				return _subList.size() > other._subList.size() ? 1 : -1;
-		}
-		else if (_isNumber) {
-			list converted{ {_number} };
-			return converted.compare(other);
-		}
-		else {
-			list converted{ {other._number} };
-			return compare(converted);
-		}
-
-	}
-private:
-	bool _isNumber{ true };
-	int _number{ 0 };
-	std::vector<list> _subList;
-};
-
-//list make_list(std::string string) {
-//	
-//}
+void make_test_lists(vector<list>& first, vector<list>& second);
 
 void test() {
 	cout << " AoC 2022 Day13 test" << endl;
@@ -59,13 +21,20 @@ void test() {
 
 	vector<bool> testResults{ true, true, false, true, false, true, false, false };
 
-	constexpr bool isTest = true;
+	constexpr bool isTest = false;
 	int testIndex = 0;
 	int count = 0;
 	int index = 1;
 
-	vector<list> first({ {1,1,3,1,1}, {{{1}},{2,3,4}}, {{9}} });
-	vector<list> second({ {1,1,5,1,1}, {{{1}}, 4}, {{8,7,6}} });
+	//vector<list> first({ {1,1,3,1,1}, {{1},{2,3,4}}, {9} });
+	//vector<list> second({ {1,1,5,1,1}, {{1}, 4}, {{8,7,6}} });
+
+	vector<list> first, second;
+
+	if (isTest)
+		make_test_lists(first, second);
+	else
+		make_lists(first, second);
 
 	assert(first.size() == second.size());
 
