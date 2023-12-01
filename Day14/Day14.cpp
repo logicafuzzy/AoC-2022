@@ -2,33 +2,40 @@
 
 #include <fstream>
 #include <string>
-#include <regex>
 #include <iterator>
+#include <sstream>
+
+#include <unordered_map>
 
 using namespace std;
 
+enum class cell_type {
+	air,
+	rock,
+	sand
+};
+
 int main() {
-	cout << " AoC 2022 Day16" << endl;
+	cout << " AoC 2022 Day14" << endl;
 
-	ifstream input("Day16test.txt");
+	ifstream input("Day14test.txt");
 
-	while (input) {
+	unordered_map<int, unordered_map<int, cell_type>> map;
+
+	while (!input.eof()) {
 		string line;
 		getline(input, line);
 
-		if (line.length() == 0)
-			break;
+		stringstream sline(line);
 
-		regex line_regex("Valve (..) has flow rate=(\d+); tunnels? leads? to valves? (?:(..), )?(?:(..), )?(?:(..), )?(?:(..), )?(?:(..), )?(..)", regex_constants::match_any);
+		int x1, y1;
+		sline >> x1;
+		sline >> y1;
+		while (!sline.eof()) {
+			int x2, y2;
+			sline >> x2;
+			sline >> y2;
 
-		auto match_begin = sregex_iterator(line.begin(), line.end(), line_regex);
-		auto match_end = sregex_iterator();
-
-		int nmatch = 0;
-		for (sregex_iterator i = match_begin; i != match_end; ++i) {
-			auto match = *i;
-			string match_str = match.str();
-			cout << "group" << nmatch++ << ": " << match_str << endl;
 		}
 	}
 
