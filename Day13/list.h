@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <sstream>
 
 using namespace std;
 
@@ -12,7 +13,6 @@ public:
 
 	int compare(const list& other) {
 		if (_isNumber && other._isNumber) {
-			cout << "compare " << _number << " with " << other._number << endl;
 			return _number == other._number ? 0 : _number < other._number ? -1 : 1;
 		}
 		else if (!_isNumber && !other._isNumber) {
@@ -39,6 +39,30 @@ public:
 		}
 
 	}
+
+	bool operator<(const list& other) {
+		return compare(other) == -1;
+	}
+
+	bool operator==(const list& other) {
+		return compare(other) == 0;
+	}
+
+	string toString() {
+		stringstream s;
+
+		if (_isNumber)
+			s << _number;
+		else {
+			s << "[";
+			for (auto& list : _subList)
+				s << list.toString() << " ";
+			s << "]";
+		}
+
+		return s.str();
+	}
+
 private:
 	bool _isNumber{ true };
 	int _number{ 0 };
