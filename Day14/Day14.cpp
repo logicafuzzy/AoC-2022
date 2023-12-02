@@ -10,6 +10,8 @@
 
 using namespace std;
 
+bool constexpr isPart2 = true;
+
 enum class cell_type {
 	air,
 	rock,
@@ -60,6 +62,41 @@ evolution_type evolve(map_type& map, int& x, int& y) {
 
 	if (endless_void(map, x + 1, y + 1))
 		return evolution_type::endless_void;
+
+	if (map[x + 1][y + 1] == cell_type::air) {
+		map[x + 1][y + 1] = cell_type::sand;
+		map[x][y] = cell_type::air;
+		++x; ++y;
+		return evolution_type::moving;
+	}
+
+	return evolution_type::rest;
+}
+
+// return true if sand moved
+evolution_type evolve_part2(map_type & map, int& x, int& y) {
+	if (endless_void(map, x, y + 1))
+		map[x][y + 1] = cell_type::air;
+
+	if (map[x][y + 1] == cell_type::air) {
+		map[x][y + 1] = cell_type::sand;
+		map[x][y] = cell_type::air;
+		++y;
+		return evolution_type::moving;
+	}
+
+	if (endless_void(map, x - 1, y + 1))
+		map[x - 1][y + 1] = cell_type::air;
+
+	if (map[x - 1][y + 1] == cell_type::air) {
+		map[x - 1][y + 1] = cell_type::sand;
+		map[x][y] = cell_type::air;
+		--x; ++y;
+		return evolution_type::moving;
+	}
+
+	if (endless_void(map, x + 1, y + 1))
+		map[x + 1][y + 1] = cell_type::air;
 
 	if (map[x + 1][y + 1] == cell_type::air) {
 		map[x + 1][y + 1] = cell_type::sand;
@@ -177,6 +214,11 @@ int main() {
 
 	input.close();
 
+	if (isPart2) {
+		ymax += 2;
+		add_rock_line(map, xmin, ymax, xmax, ymax);
+	}
+
 	fill(map, xmin, xmax, ymin, ymax);
 
 	print_map(map, xmin, xmax, ymin, ymax);
@@ -187,20 +229,38 @@ int main() {
 		int y = yorigin;
 		evolution_type evolution;
 		do {
-			evolution = evolve(map, x, y);
+			evolution = isPart2 ? evolve_part2(map, x, y) : evolve(map, x, y);
+			if (isPart2) {
+				if (ymax - y == 1) {
+					add_rock_line(map, x - 1, ymax, x + 1, ymax);
+				}
+				if (y > ymax || y < ymin || x > xmax || x < xmin) {
+					update_minmax(y, ymin, ymax);
+					update_minmax(x, xmin, xmax);
+					fill(map, xmin, xmax, ymin, ymax);
+				}
+			}
 		} while (evolution == evolution_type::moving);
 
-		if (evolution == evolution_type::endless_void) {
-			break;
+		if (!isPart2) {
+			if (evolution == evolution_type::endless_void) {
+				break;
+			}
+			else {
+				++units;
+			}
 		}
 		else {
-			++units;
+			if (x == xorigin && y == yorigin)
+				break;
+			else
+				++units;
 		}
 	}
 
 	print_map(map, xmin, xmax, ymin, ymax);
 
-	cout << "Units: " << units << endl;
+	cout << "Units: " << units + (isPart2?1:0) << endl;
 
 	return 0;
 }
