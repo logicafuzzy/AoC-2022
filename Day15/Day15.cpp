@@ -22,7 +22,7 @@ int xmax{ std::numeric_limits<int>::min() };
 int ymin{ std::numeric_limits<int>::max() };
 int ymax{ std::numeric_limits<int>::min() };
 
-#define TEST
+//#define TEST
 #define PART2
 
 #ifdef TEST
@@ -71,8 +71,15 @@ void add_line(map_type& map, int x1, int y1, int x2, int y2) {
 	assert(x1 == x2 || y1 == y2);
 
 	if (x1 == x2) {
-		if (min(y1, y2) >= 0 && max(y1, y2) <= max_coord)
-			for (int y = min(y1, y2); y <= max(y1, y2); ++y) {
+		
+		if (y2 < y1) 
+			swap(y1, y2);
+
+		y1 = max(y1, 0);
+		y2 = min(y2, max_coord);
+
+		if (y1 < max_coord && y2 >= 0)
+			for (int y = y1; y <= y2; ++y) {
 				if (map.find(y) == map.end() || map[y].find(x1) == map[y].end())
 					map[y][x1] = cell_type::no_beacon;
 			}
@@ -80,7 +87,14 @@ void add_line(map_type& map, int x1, int y1, int x2, int y2) {
 	else {
 		if (y1 < 0 || y1 > max_coord)
 			return;
-		for (int x = min(x1, x2); x <= max(x1, x2); ++x) {
+
+		if (x2 < x1)
+			swap(x1, x2);
+
+		x1 = max(x1, 0);
+		x2 = min(x2, max_coord);
+
+		for (int x =x1; x <= x2; ++x) {
 			if (map.find(y1) == map.end() || map[y1].find(x) == map[y1].end())
 				map[y1][x] = cell_type::no_beacon;
 		}
@@ -198,8 +212,8 @@ int main() {
 		if (beacon_y < 0 || beacon_y > max_coord)
 			continue;
 		int count = 0;
-		int cell_xmin = 0;
-		int cell_xmax = numeric_limits<int>::max();
+		int cell_xmin = max_coord;
+		int cell_xmax = 0;
 		for (auto& cell : row.second) {
 			beacon_x = cell.first;
 			if (beacon_x < 0 || beacon_x > max_coord)
@@ -208,8 +222,15 @@ int main() {
 			++count;
 		}
 		printf("Row %d count: %d\n", beacon_y, count);
-		if (count == cell_xmax - cell_xmin - 1)
+		if (count == cell_xmax - cell_xmin)
 			break;
+	}
+	for (int i = 0; i <= max_coord; ++i) {
+		auto& row = map[beacon_y];
+		if (row.find(i) == row.end()) {
+			beacon_x = i;
+			break;
+		}
 	}
 	printf("Beacon in %d, %d frequency: %d", beacon_x, beacon_y, beacon_x * 4000000 + beacon_y);
 #else
