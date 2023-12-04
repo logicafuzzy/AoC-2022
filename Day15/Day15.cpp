@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <unordered_map>
+#include <map>
 #include <cassert>
 #include <algorithm>
 
@@ -12,17 +12,21 @@ using namespace std;
 enum class cell_type {
 	sensor,
 	beacon,
-	no_beacon
+	no_beacon,
+	no_beacon_right,
+	no_beacon_left,
+	no_beacon_up,
+	no_beacon_down
 };
 
-using map_type = unordered_map<int, unordered_map<int, cell_type>>;
+using map_type = map<int, map<int, cell_type>>;
 
 int xmin{ std::numeric_limits<int>::max() };
 int xmax{ std::numeric_limits<int>::min() };
 int ymin{ std::numeric_limits<int>::max() };
 int ymax{ std::numeric_limits<int>::min() };
 
-//#define TEST
+#define TEST
 #define PART2
 
 #ifdef TEST
@@ -46,6 +50,18 @@ void print_map(map_type& map, int xmin, int xmax, int ymin, int ymax) {
 					break;
 				case cell_type::no_beacon:
 					cout << '#';
+					break;
+				case cell_type::no_beacon_right:
+					cout << '>';
+					break;
+				case cell_type::no_beacon_left:
+					cout << '<';
+					break;
+				case cell_type::no_beacon_up:
+					cout << '^';
+					break;
+				case cell_type::no_beacon_down:
+					cout << 'v';
 					break;
 				}
 			}
@@ -78,11 +94,10 @@ void add_line(map_type& map, int x1, int y1, int x2, int y2) {
 		y1 = max(y1, 0);
 		y2 = min(y2, max_coord);
 
-		if (y1 < max_coord && y2 >= 0)
-			for (int y = y1; y <= y2; ++y) {
-				if (map.find(y) == map.end() || map[y].find(x1) == map[y].end())
-					map[y][x1] = cell_type::no_beacon;
-			}
+		if (y1 < max_coord && y2 >= 0) {
+			map[y1][x1] = cell_type::no_beacon_down;
+			map[y2][x1] = cell_type::no_beacon_up;
+		}
 	}
 	else {
 		if (y1 < 0 || y1 > max_coord)
@@ -94,9 +109,9 @@ void add_line(map_type& map, int x1, int y1, int x2, int y2) {
 		x1 = max(x1, 0);
 		x2 = min(x2, max_coord);
 
-		for (int x =x1; x <= x2; ++x) {
-			if (map.find(y1) == map.end() || map[y1].find(x) == map[y1].end())
-				map[y1][x] = cell_type::no_beacon;
+		if (x1 < max_coord && x2 > 0) {
+			map[y1][x1] = cell_type::no_beacon_right;
+			map[y1][x2] = cell_type::no_beacon_left;
 		}
 	}
 }
@@ -184,7 +199,7 @@ int main() {
 		update_minmax(beacon_y, ymin, ymax);
 #endif
 
-		//if (sensor_x == 8 && sensor_y == 7)
+		if (sensor_x == 8 && sensor_y == 7)
 			update_area(map, sensor_x, sensor_y, beacon_x, beacon_y);
 
 		printf("xmix %d, xmax %d, ymin %d, ymax %d\r", xmin, xmax, ymin, ymax);
